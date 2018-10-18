@@ -10,7 +10,11 @@
   "author": "Martin Bobbio",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.3",
     "express": "^4.16.4",
-    "mongoose": "^5.3.4"
+    "jsonwebtoken": "^8.3.0",
+    "mongoose": "^5.3.4",
+    "mongoose-unique-validator": "^2.0.2"
   }
 }

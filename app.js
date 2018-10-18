@@ -1,26 +1,31 @@
 //Requires
 var express = require("express");
 var mongoose = require("mongoose");
+var bodyParser = require("body-parser");
 
 //Initialization
 var app = express();
 
-//Connection BBDD
-mongoose.connection.openUri(
-  "mongodb://localhost:27017/hospitalDB",
-  (err, resp) => {
-    if (err) throw err;
+//Body Parser
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-    console.log("Base de datos: \x1b[32m%s\x1b[0m", "online");
-  }
-);
+//Connection BBDD
+mongoose.connection.openUri("mongodb://localhost:27017/hospitalDB", err => {
+  if (err) throw err;
+
+  console.log("Base de datos: \x1b[32m%s\x1b[0m", "online");
+});
+
+//Import Routes
+var appRoutes = require("./routes/app");
+var userRoutes = require("./routes/user");
+var loginRoutes = require("./routes/login");
 
 //Routes
-app.get("/", (req, res, next) => {
-  res.status(200).json({
-    ok: true
-  });
-});
+app.use("/user", userRoutes);
+app.use("/login", loginRoutes);
+app.use("/", appRoutes);
 
 //Listener
 app.listen(3000, () => {
