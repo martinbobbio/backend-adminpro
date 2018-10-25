@@ -20,11 +20,21 @@ mongoose.connection.openUri("mongodb://localhost:27017/hospitalDB", err => {
 //Import Routes
 var appRoutes = require("./routes/app");
 var userRoutes = require("./routes/user");
+var hospitalRoutes = require("./routes/hospital");
+var doctorRoutes = require("./routes/doctor");
+var searchRoutes = require("./routes/search");
 var loginRoutes = require("./routes/login");
+var uploadRoutes = require("./routes/upload");
+var imagesRoutes = require("./routes/images");
 
 //Routes
 app.use("/user", userRoutes);
+app.use("/hospital", hospitalRoutes);
+app.use("/doctor", doctorRoutes);
+app.use("/search", searchRoutes);
 app.use("/login", loginRoutes);
+app.use("/upload", uploadRoutes);
+app.use("/img", imagesRoutes);
 app.use("/", appRoutes);
 
 //Listener

@@ -7,6 +7,9 @@ var app = express();
 
 var User = require("../models/user");
 
+// =======================================
+// Auth
+// =======================================
 app.post("/", (req, res) => {
   var body = req.body;
 

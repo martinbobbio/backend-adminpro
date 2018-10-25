@@ -1,141 +1,134 @@
 var express = require("express");
-var bcrypt = require("bcryptjs");
 var mdAuth = require("../middlewares/auth");
 
 var app = express();
 
-var User = require("../models/user");
+var Hospital = require("../models/hospital");
 
 // =======================================
-// Get users
+// Get hospitals
 // =======================================
-app.get("/", (req, res, next) => {
+app.get("/", (req, res) => {
   var since = req.query.since || 0;
   since = Number(since);
 
-  User.find({}, "name email img role")
+  Hospital.find({})
     .skip(since)
     .limit(5)
-    .exec((err, users) => {
+    .populate("user", "name email")
+    .exec((err, hospitals) => {
       if (err) {
         return res.status(500).json({
           ok: false,
-          message: "Error in users",
+          message: "Error in hospitals",
           errors: err
         });
       }
 
-      User.count({}, (err, count) => {
+      Hospital.count({}, (count) => {
         res.status(200).json({
           ok: true,
           total: count,
-          users
+          hospitals
         });
       });
     });
 });
 
 // =======================================
-// Update users
+// Update hospitals
 // =======================================
 app.put("/:id", mdAuth.verifyToken, (req, res) => {
   var id = req.params.id;
   var body = req.body;
 
-  User.findById(id, (err, user) => {
+  Hospital.findById(id, (err, hospital) => {
     if (err) {
       return res.status(500).json({
         ok: false,
-        message: "Error in search users",
+        message: "Error in search hospitals",
         errors: err
       });
     }
-    if (!user) {
+    if (!hospital) {
       return res.status(400).json({
         ok: false,
-        message: "The user not exists",
-        errors: { message: "User not exists" }
+        message: "The hospital not exists",
+        errors: { message: "Hospitals not exists" }
       });
     }
 
-    user.name = body.name;
-    user.email = body.email;
-    user.role = body.role;
+    hospital.name = body.name;
+    hospital.user = req.user._id;
 
-    user.save((err, user) => {
+    hospital.save((err, hospital) => {
       if (err) {
         return res.status(400).json({
           ok: false,
-          message: "Error in update users",
+          message: "Error in update hospital",
           errors: err
         });
       }
 
-      user.password = "SECRET";
-
       res.status(200).json({
         ok: true,
-        user
+        hospital
       });
     });
   });
 });
 
 // =======================================
-// Create users
+// Create hospital
 // =======================================
 app.post("/", mdAuth.verifyToken, (req, res) => {
   var body = req.body;
-  var user = new User({
+  var hospital = new Hospital({
     name: body.name,
-    email: body.email,
-    password: bcrypt.hashSync(body.password, 10),
-    img: body.img,
-    role: body.role
+    user: req.user._id
   });
 
-  user.save((err, user) => {
+  hospital.save((err, hospital) => {
     if (err) {
       return res.status(400).json({
         ok: false,
-        message: "Error in create users",
+        message: "Error in create hospital",
         errors: err
       });
     }
 
     res.status(201).json({
       ok: true,
-      user,
-      userCreator: req.user
+      hospital
     });
   });
 });
 
 // =======================================
-// Delete users
+// Delete hospital
 // =======================================
 app.delete("/:id", mdAuth.verifyToken, (req, res) => {
   var id = req.params.id;
 
-  User.findByIdAndRemove(id, (err, user) => {
+  Hospital.findByIdAndRemove(id, (err, hospital) => {
     if (err) {
       return res.status(500).json({
         ok: false,
-        message: "Error in delete users",
+        message: "Error in delete hospital",
         errors: err
       });
     }
-    if (!user) {
+    if (!hospital) {
       return res.status(400).json({
         ok: false,
-        message: "The user not exists",
-        errors: { message: "User not exists" }
+        message: "The hospital not exists",
+        errors: { message: "Hospital not exists" }
       });
     }
 
     res.status(200).json({
       ok: true,
-      user
+      hospital
     });
   });
 });

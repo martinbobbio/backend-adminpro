@@ -1,141 +1,137 @@
 var express = require("express");
-var bcrypt = require("bcryptjs");
 var mdAuth = require("../middlewares/auth");
 
 var app = express();
 
-var User = require("../models/user");
+var Doctor = require("../models/doctor");
 
 // =======================================
-// Get users
+// Get doctors
 // =======================================
-app.get("/", (req, res, next) => {
+app.get("/", (req, res) => {
   var since = req.query.since || 0;
   since = Number(since);
 
-  User.find({}, "name email img role")
+  Doctor.find({})
     .skip(since)
     .limit(5)
-    .exec((err, users) => {
+    .populate("user", "name email")
+    .populate("hospital", "name email")
+    .exec((err, doctors) => {
       if (err) {
         return res.status(500).json({
           ok: false,
-          message: "Error in users",
+          message: "Error in doctors",
           errors: err
         });
       }
 
-      User.count({}, (err, count) => {
+      Doctor.count({}, (count) => {
         res.status(200).json({
           ok: true,
           total: count,
-          users
+          doctors
         });
       });
     });
 });
 
 // =======================================
-// Update users
+// Update doctors
 // =======================================
 app.put("/:id", mdAuth.verifyToken, (req, res) => {
   var id = req.params.id;
   var body = req.body;
 
-  User.findById(id, (err, user) => {
+  Doctor.findById(id, (err, doctor) => {
     if (err) {
       return res.status(500).json({
         ok: false,
-        message: "Error in search users",
+        message: "Error in search doctors",
         errors: err
       });
     }
-    if (!user) {
+    if (!doctor) {
       return res.status(400).json({
         ok: false,
-        message: "The user not exists",
-        errors: { message: "User not exists" }
+        message: "The doctor not exists",
+        errors: { message: "Doctor not exists" }
       });
     }
 
-    user.name = body.name;
-    user.email = body.email;
-    user.role = body.role;
+    doctor.name = body.name;
+    doctor.hospital = body.hospital;
+    doctor.user = req.user._id;
 
-    user.save((err, user) => {
+    doctor.save((err, doctor) => {
       if (err) {
         return res.status(400).json({
           ok: false,
-          message: "Error in update users",
+          message: "Error in update doctor",
           errors: err
         });
       }
 
-      user.password = "SECRET";
-
       res.status(200).json({
         ok: true,
-        user
+        doctor
       });
     });
   });
 });
 
 // =======================================
-// Create users
+// Create doctor
 // =======================================
 app.post("/", mdAuth.verifyToken, (req, res) => {
   var body = req.body;
-  var user = new User({
+  var doctor = new Doctor({
     name: body.name,
-    email: body.email,
-    password: bcrypt.hashSync(body.password, 10),
-    img: body.img,
-    role: body.role
+    user: req.user._id,
+    hospital: body.hospital
   });
 
-  user.save((err, user) => {
+  doctor.save((err, doctor) => {
     if (err) {
       return res.status(400).json({
         ok: false,
-        message: "Error in create users",
+        message: "Error in create doctor",
         errors: err
       });
     }
 
     res.status(201).json({
       ok: true,
-      user,
-      userCreator: req.user
+      doctor
     });
   });
 });
 
 // =======================================
-// Delete users
+// Delete doctor
 // =======================================
 app.delete("/:id", mdAuth.verifyToken, (req, res) => {
   var id = req.params.id;
 
-  User.findByIdAndRemove(id, (err, user) => {
+  Doctor.findByIdAndRemove(id, (err, doctor) => {
     if (err) {
       return res.status(500).json({
         ok: false,
-        message: "Error in delete users",
+        message: "Error in delete doctor",
         errors: err
       });
     }
-    if (!user) {
+    if (!doctor) {
       return res.status(400).json({
         ok: false,
-        message: "The user not exists",
-        errors: { message: "User not exists" }
+        message: "The doctor not exists",
+        errors: { message: "Doctor not exists" }
       });
     }
 
     res.status(200).json({
       ok: true,
-      user
+      doctor
     });
   });
 });
