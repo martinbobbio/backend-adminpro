@@ -36,10 +36,11 @@ app.put("/:type/:id", (req, res) => {
       }
     });
   }
-  if (validTypes.indexOf(extensionFile) < 0) {
+  if (validTypes.indexOf(type) < 0) {
     return res.status(400).json({
       ok: false,
       message: "Invalid type",
+      type: extensionFile,
       errors: { message: "The type valid are " + validTypes.join(", ") }
     });
   }
@@ -62,70 +63,82 @@ app.put("/:type/:id", (req, res) => {
 });
 
 function uploadByType(type, id, nameFile, res) {
+
   if (type === "user") {
-    User.findById(id, (user) => {
-      if(!user){
-        return res.status(500).json({
-          ok: false,
-          message: "User not exists",
-          errors: { message: "User not exists" }
-        });
-      }
+    User.findById(id, (err,user) => {
+
+      if(!user) HttpNotFound("User", res);
+      if(err) HttpErrorServer("User", res, err);
+      
       var pathOld = "./uploads/user/" + user.img;
       if (fs.existsSync(pathOld)) fs.unlink(pathOld);
       user.img = nameFile;
-      user.save((userNew) => {
+      user.save((err, userNew) => {
+        if(err) HttpErrorServer("User", res, err);
         userNew.password = "SECRET";
-        return res.status(200).json({
-          ok: true,
-          message: "User image updated",
-          user: userNew
-        });
+        HttpSuccess("User", userNew, res);
       });
     });
   }
+
   if (type === "doctor") {
-    Doctor.findById(id, (doctor) => {
-      if(!doctor){
-        return res.status(500).json({
-          ok: false,
-          message: "Doctor not exists",
-          errors: { message: "Doctor not exists" }
-        });
-      }
+    Doctor.findById(id, (err,doctor) => {
+
+      if(!doctor) HttpNotFound("Doctor", res);
+      if(err) HttpErrorServer("Doctor", res, err);
+
       var pathOld = "./uploads/doctor/" + doctor.img;
       if (fs.existsSync(pathOld)) fs.unlink(pathOld);
       doctor.img = nameFile;
-      doctor.save((doctorNew) => {
-        return res.status(200).json({
-          ok: true,
-          message: "Doctor image updated",
-          user: doctorNew
-        });
+      doctor.save((err, doctorNew) => {
+        if(err) HttpErrorServer("Doctor", res, err);
+        HttpSuccess("Doctor", doctorNew, res);
       });
     });
   }
+
   if (type === "hospital") {
-    Hospital.findById(id, (hospital) => {
-      if(!hospital){
-        return res.status(500).json({
-          ok: false,
-          message: "Hospital not exists",
-          errors: { message: "Hospital not exists" }
-        });
-      }
+    Hospital.findById(id, (err,hospital) => {
+      
+      if(!hospital) HttpNotFound("Hospital", res);
+      if(err) HttpErrorServer("Hospital", res, err);
+
       var pathOld = "./uploads/hospital/" + hospital.img;
       if (fs.existsSync(pathOld)) fs.unlink(pathOld);
       hospital.img = nameFile;
-      hospital.save((hospitalNew) => {
-        return res.status(200).json({
-          ok: true,
-          message: "Hospital image updated",
-          user: hospitalNew
-        });
+      hospital.save((err, hospitalNew) => {
+        if(err) HttpErrorServer("Hospital", res, err);
+        HttpSuccess("Hospital", hospitalNew, res);
       });
     });
   }
 }
+
+function HttpNotFound(entityText, res){
+  return res.status(400).json({
+    ok: false,
+    message: `${entityText} not exists`,
+    errors: { message: `${entityText} not exists` }
+  });
+}
+
+function HttpErrorServer(entityText, res, err){
+  return res.status(500).json({
+    ok: false,
+    message: `Error in search ${entityText}`,
+    errors: err
+  });
+}
+
+function HttpSuccess(entityText, entity, res){
+  return res.status(200).json({
+    ok: true,
+    message: `${entityText} image updated`,
+    entity
+  });
+}
+
+
+
 
 module.exports = app;

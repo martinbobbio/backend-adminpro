@@ -20,7 +20,8 @@ app.get("/all/:search", (req, res) => {
     res.status(200).json({
       ok: true,
       hospitals: response[0],
-      doctors: response[1]
+      doctors: response[1],
+      users: response[2]
     });
   });
 });
@@ -28,7 +29,7 @@ app.get("/all/:search", (req, res) => {
 function searchHospitals(regex) {
   return new Promise((resolve, reject) => {
     Hospital.find({ name: regex })
-      .populate("user", "name email")
+      .populate("user", "name email img")
       .exec((err, hospitals) => {
         if (err ? reject("Error to load hospitals", err) : resolve(hospitals));
       });
@@ -37,19 +38,19 @@ function searchHospitals(regex) {
 function searchDoctors(regex) {
   return new Promise((resolve, reject) => {
     Doctor.find({ name: regex })
-      .populate("user", "name email")
+      .populate("user", "name email img")
       .populate("hospital")
       .exec((err, doctors) => {
-        if (err ? reject("Error to load hospitals", err) : resolve(doctors));
+        if (err ? reject("Error to load doctors", err) : resolve(doctors));
       });
   });
 }
 function searchUsers(regex) {
   return new Promise((resolve, reject) => {
-    User.find({}, "name email role")
+    User.find({}, "name email role google img")
       .or([{ name: regex }, { email: regex }])
       .exec((err, users) => {
-        if (err ? reject("Error to load hospitals", err) : resolve(users));
+        if (err ? reject("Error to load users", err) : resolve(users));
       });
   });
 }

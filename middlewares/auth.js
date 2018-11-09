@@ -16,3 +16,40 @@ exports.verifyToken = function(req, res, next) {
     next();
   });
 };
+
+exports.verifyAdmin = function(req, res, next) {
+
+  var user = req.user;
+
+  if(user.role === 'ADMIN_ROLE'){
+    next();
+    return;
+  }else{
+    if (err) {
+      return res.status(401).json({
+        ok: false,
+        message: "Incorrect token - Not an admin",
+        errors: { message: 'Not is an admin, cant do it' }
+      });
+    }
+  }
+};
+
+exports.verifyEqualUser = function(req, res, next) {
+
+  var user = req.user;
+  var id = req.params.id;
+
+  if(user.role === 'ADMIN_ROLE' || user._id === id){
+    next();
+    return;
+  }else{
+    if (err) {
+      return res.status(401).json({
+        ok: false,
+        message: "Incorrect token - Not an admin or equal user",
+        errors: { message: 'Not is an admin or equal user' }
+      });
+    }
+  }
+};

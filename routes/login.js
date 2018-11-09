@@ -4,7 +4,7 @@ var jwt = require("jsonwebtoken");
 var SEED = require("../config/config").SEED;
 var app = express();
 var User = require("../models/user");
-
+var mdAuth = require("../middlewares/auth");
 
 //GOOGLE
 var CLIENT_ID = require("../config/config").CLIENT_ID;
@@ -16,7 +16,6 @@ async function verify(token) {
       audience: CLIENT_ID,
   });
   const payload = ticket.getPayload();
-  //const userid = payload['sub'];
 
   return { 
     name: payload.name,
@@ -27,18 +26,30 @@ async function verify(token) {
 }
 
 // =======================================
+// New Token
+// =======================================
+app.get("/newtoken",mdAuth.verifyToken, (req, res)=>{
+
+  var token = jwt.sign({ user: req.user }, SEED, { expiresIn: 14400 });
+
+  return res.status(200).json({
+    ok: true,
+    token
+  });
+});
+// =======================================
 // Auth Google
 // =======================================
-app.post("/google", (req, res) => {
+app.post("/google", async(req, res) => {
   
   var token = req.body.token;
-  var googleUser = await verify(token).catch((err =>{
+  var googleUser = await verify(token).catch(err =>{
     return res.status(403).json({
       ok: false,
       message: "Token no válido",
       errors: err
     });
-  }));
+  });
 
   User.findOne({ email:googleUser.email }, (err,userDB)=>{
     if(err){
@@ -63,7 +74,8 @@ app.post("/google", (req, res) => {
           ok: true,
           id: userDB._id,
           user: userDB,
-          token
+          token,
+          menu : getMenu(userDB.role)
         });
       }
     }else{
@@ -81,18 +93,14 @@ app.post("/google", (req, res) => {
           ok: true,
           id: userDB._id,
           user: userDB,
-          token
+          token,
+          menu : getMenu(userDB.role)
         });
       })
 
     }
   });
 
-  return res.status(200).json({
-    ok: false,
-    message: "OK",
-    googleUser
-  });
 });
 
 // =======================================
@@ -116,7 +124,7 @@ app.post("/", (req, res) => {
         errors: err
       });
     }
-    if (bcrypt.compareSync(body.password, user.password)) {
+    if (!bcrypt.compareSync(body.password, user.password)) {
       return res.status(400).json({
         ok: false,
         message: "Invalid credentials - password",
@@ -131,9 +139,40 @@ app.post("/", (req, res) => {
       ok: true,
       id: user._id,
       user,
-      token
+      token,
+      menu : getMenu(user.role)
     });
   });
 });
+
+function getMenu(ROLE){
+
+  var menu = [
+    {
+      title: 'Principal', icon: 'mdi mdi-gauge',
+      submenu: [
+        { title: 'Dashboard', url: '/dashboard' },
+        { title: 'ProgressBar', url: '/progress' },
+        { title: 'Graphics', url: '/graphic' },
+        { title: 'Promises', url: '/promises' },
+        { title: 'RXJS', url: '/rxjs' },
+      ]
+    },
+    {
+      title: 'Entities', icon: 'mdi mdi-folder-lock-open',
+      submenu: [
+        { title: 'Hospitals', url: '/hospitals' },
+        { title: 'Doctors', url: '/doctors' },
+      ]
+    }
+  ];
+
+  if(ROLE === 'ADMIN_ROLE'){
+    menu[1].submenu.unshift({title: 'Users', url: '/users'});
+  }
+
+  return menu;
+
+}
 
 module.exports = app;

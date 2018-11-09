@@ -10,11 +10,13 @@ var Hospital = require("../models/hospital");
 // =======================================
 app.get("/", (req, res) => {
   var since = req.query.since || 0;
+  var limit = 5;
+  if( since === "all") limit = null;
   since = Number(since);
 
   Hospital.find({})
     .skip(since)
-    .limit(5)
+    .limit(limit)
     .populate("user", "name email")
     .exec((err, hospitals) => {
       if (err) {
@@ -25,12 +27,41 @@ app.get("/", (req, res) => {
         });
       }
 
-      Hospital.count({}, (count) => {
+      Hospital.count({}, (err, count) => {
         res.status(200).json({
           ok: true,
           total: count,
           hospitals
         });
+      });
+    });
+});
+
+// =======================================
+// Get hospital
+// =======================================
+app.get("/:id", (req, res) => {
+  var id = req.params.id;
+  Hospital.findById(id)
+    .populate("user", "name img email")
+    .exec((err, hospital) => {
+      if (err) {
+        return res.status(500).json({
+          ok: false,
+          message: "Error in search hospital",
+          errors: err
+        });
+      }
+      if (!hospital) {
+        return res.status(400).json({
+          ok: false,
+          message: "The hospital not exists "+id,
+          errors: { message: "The hospital with this id not exists" }
+        });
+      }
+      res.status(200).json({
+        ok: true,
+        hospital: hospital
       });
     });
 });

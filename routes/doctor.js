@@ -26,12 +26,42 @@ app.get("/", (req, res) => {
         });
       }
 
-      Doctor.count({}, (count) => {
+      Doctor.count({}, (err, count) => {
         res.status(200).json({
           ok: true,
           total: count,
           doctors
         });
+      });
+    });
+});
+
+// =======================================
+// Get doctor
+// =======================================
+app.get("/:id", (req, res) => {
+  var id = req.params.id;
+  Doctor.findById(id)
+    .populate("user", "name img email")
+    .populate("hospital")
+    .exec((err, doctor) => {
+      if (err) {
+        return res.status(500).json({
+          ok: false,
+          message: "Error in search doctor",
+          errors: err
+        });
+      }
+      if (!doctor) {
+        return res.status(400).json({
+          ok: false,
+          message: "The doctor not exists "+id,
+          errors: { message: "The doctor with this id not exists" }
+        });
+      }
+      res.status(200).json({
+        ok: true,
+        doctor
       });
     });
 });

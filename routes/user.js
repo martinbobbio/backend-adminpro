@@ -13,7 +13,7 @@ app.get("/", (req, res, next) => {
   var since = req.query.since || 0;
   since = Number(since);
 
-  User.find({}, "name email img role")
+  User.find({}, "name email img role google")
     .skip(since)
     .limit(5)
     .exec((err, users) => {
@@ -38,7 +38,7 @@ app.get("/", (req, res, next) => {
 // =======================================
 // Update users
 // =======================================
-app.put("/:id", mdAuth.verifyToken, (req, res) => {
+app.put("/:id", [mdAuth.verifyToken, mdAuth.verifyEqualUser], (req, res) => {
   var id = req.params.id;
   var body = req.body;
 
@@ -84,7 +84,7 @@ app.put("/:id", mdAuth.verifyToken, (req, res) => {
 // =======================================
 // Create users
 // =======================================
-app.post("/", mdAuth.verifyToken, (req, res) => {
+app.post("/", (req, res) => {
   var body = req.body;
   var user = new User({
     name: body.name,
@@ -114,7 +114,7 @@ app.post("/", mdAuth.verifyToken, (req, res) => {
 // =======================================
 // Delete users
 // =======================================
-app.delete("/:id", mdAuth.verifyToken, (req, res) => {
+app.delete("/:id", [mdAuth.verifyToken, mdAuth.verifyAdmin], (req, res) => {
   var id = req.params.id;
 
   User.findByIdAndRemove(id, (err, user) => {

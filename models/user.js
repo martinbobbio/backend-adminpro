@@ -17,4 +17,4 @@ var userSchema = new Schema({
 });
 userSchema.plugin(uniqueValidator, {message: '{PATH} The email is unique'});
 
-module.exports = mongoose.model('user', userSchema);
+module.exports = mongoose.model('User', userSchema);
