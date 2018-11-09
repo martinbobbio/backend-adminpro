@@ -5,7 +5,7 @@
   Adminpro - Backend
   <br>
 </h1>
-<h4 align="center"><a target="_blank" href="https://github.com/martinbobbio/frontend-adminpro">Adminpro - Frontend</a></h4>
+<h4 align="center"><a href="https://github.com/martinbobbio/frontend-adminpro">Adminpro - Frontend</a></h4>
 
 
 ## Descripción
