@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 //Connection BBDD
 const env = process.argv[2] || 'dev'
 if(env === 'dev')
-    mongoose.connect('mongodb://localhost:27017/hospitalDB', { useNewUrlParser: true }, console.log("Base de datos dev: \x1b[32m%s\x1b[0m", "online"))
+    mongoose.connect('mongodb://mbobbio:mbobbio1010@ds155626.mlab.com:55626/admin-pro', { useNewUrlParser: true }, () => console.log("Base de datos prod: \x1b[32m%s\x1b[0m", "online"))
 else if(env === 'prod')
     mongoose.connect('mongodb://mbobbio:mbobbio1010@ds155626.mlab.com:55626/admin-pro', { useNewUrlParser: true }, () => console.log("Base de datos prod: \x1b[32m%s\x1b[0m", "online"))
 
