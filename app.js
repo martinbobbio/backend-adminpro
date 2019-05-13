@@ -19,11 +19,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //Connection BBDD
-mongoose.connection.openUri("mongodb://localhost:27017/hospitalDB", err => {
-  if (err) throw err;
-
-  console.log("Base de datos: \x1b[32m%s\x1b[0m", "online");
-});
+const env = process.argv[2] || 'dev'
+if(env === 'dev')
+    mongoose.connect('mongodb://localhost:27017/hospitalDB', { useNewUrlParser: true }, console.log("Base de datos: \x1b[32m%s\x1b[0m", "online"))
+else if(env === 'prod')
+    mongoose.connect('mongodb://mbobbio:mbobbio1010@ds155626.mlab.com:55626/admin-pro', { useNewUrlParser: true }, () => console.log("Base de datos: \x1b[32m%s\x1b[0m", "online"))
 
 //Import Routes
 var appRoutes = require("./routes/app");
@@ -46,6 +46,7 @@ app.use("/img", imagesRoutes);
 app.use("/", appRoutes);
 
 //Listener
-app.listen(3000, () => {
-  console.log("Express server puerto 3000: \x1b[32m%s\x1b[0m", "online");
+const port = process.env.PORT || 5000
+app.listen(port, () => {
+  console.log(`Express server puerto ${port}: \x1b[32m%s\x1b[0m`, "online");
 });
