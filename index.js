@@ -25,6 +25,8 @@ if(env === 'dev')
 else if(env === 'prod')
     mongoose.connect('mongodb://mbobbio:mbobbio1010@ds155626.mlab.com:55626/admin-pro', { useNewUrlParser: true }, () => console.log("Base de datos prod: \x1b[32m%s\x1b[0m", "online"))
 
+mongoose.set('useCreateIndex', true);
+
 //Import Routes
 var appRoutes = require("./routes/app");
 var userRoutes = require("./routes/user");
