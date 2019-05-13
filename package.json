@@ -4,7 +4,7 @@
   "description": "Servidor backend del curso de Angular Avanzado",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node ./index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Martin Bobbio",
