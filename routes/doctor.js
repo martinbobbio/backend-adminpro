@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
         });
       }
 
-      Doctor.count({}, (err, count) => {
+      Doctor.countDocuments({}, (err, count) => {
         res.status(200).json({
           ok: true,
           total: count,
