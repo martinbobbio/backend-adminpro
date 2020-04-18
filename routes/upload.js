@@ -71,7 +71,12 @@ function uploadByType(type, id, nameFile, res) {
       if(err) HttpErrorServer("User", res, err);
       
       var pathOld = "./uploads/user/" + user.img;
-      if (fs.existsSync(pathOld)) fs.unlink(pathOld);
+      if (fs.existsSync(pathOld)) {
+        fs.unlink(pathOld, (err) => {
+          if (err) throw err;
+          console.log(`${pathOld} was deleted`);
+        });
+      }
       user.img = nameFile;
       user.save((err, userNew) => {
         if(err) HttpErrorServer("User", res, err);
@@ -88,7 +93,12 @@ function uploadByType(type, id, nameFile, res) {
       if(err) HttpErrorServer("Doctor", res, err);
 
       var pathOld = "./uploads/doctor/" + doctor.img;
-      if (fs.existsSync(pathOld)) fs.unlink(pathOld);
+      if (fs.existsSync(pathOld)) {
+        fs.unlink(pathOld, (err) => {
+          if (err) throw err;
+          console.log(`${pathOld} was deleted`);
+        });
+      }
       doctor.img = nameFile;
       doctor.save((err, doctorNew) => {
         if(err) HttpErrorServer("Doctor", res, err);
@@ -104,7 +114,12 @@ function uploadByType(type, id, nameFile, res) {
       if(err) HttpErrorServer("Hospital", res, err);
 
       var pathOld = "./uploads/hospital/" + hospital.img;
-      if (fs.existsSync(pathOld)) fs.unlink(pathOld);
+      if (fs.existsSync(pathOld)) {
+        fs.unlink(pathOld, (err) => {
+          if (err) throw err;
+          console.log(`${pathOld} was deleted`);
+        });
+      }
       hospital.img = nameFile;
       hospital.save((err, hospitalNew) => {
         if(err) HttpErrorServer("Hospital", res, err);
