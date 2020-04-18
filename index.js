@@ -19,13 +19,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //Connection BBDD
-const env = process.argv[2] || 'dev'
-if(env === 'dev')
-    mongoose.connect('mongodb://mbobbio:mbobbio1010@ds155626.mlab.com:55626/admin-pro', { useNewUrlParser: true }, () => console.log("Base de datos prod: \x1b[32m%s\x1b[0m", "online"))
-else if(env === 'prod')
-    mongoose.connect('mongodb://mbobbio:mbobbio1010@ds155626.mlab.com:55626/admin-pro', { useNewUrlParser: true }, () => console.log("Base de datos prod: \x1b[32m%s\x1b[0m", "online"))
+const env = process.env.ENV || 'dev'
+let adressDB;
 
+if(env === 'dev') adressDB = 'mongodb://localhost/hospitalDB'
+else if(env === 'prod') adressDB = 'mongodb://mbobbio:mbobbio1010@ds155626.mlab.com:55626/admin-pro'
+else if(env === 'docker') adressDB = 'mongodb://mongo:27017/hospitalDB'
+  
+mongoose.connect(adressDB, { useNewUrlParser: true })
+.then(() => console.log("Base de datos "+env+": \x1b[32m%s\x1b[0m", "online"))
+.catch(error => console.log(`Error al conectar la DB en ${env}`, error))
 mongoose.set('useCreateIndex', true);
+mongoose.set('useNewUrlParser', true)
 
 //Import Routes
 var appRoutes = require("./routes/app");
@@ -48,7 +53,7 @@ app.use("/img", imagesRoutes);
 app.use("/", appRoutes);
 
 //Listener
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 8080
 app.listen(port, () => {
-  console.log(`Express server puerto ${port}: \x1b[32m%s\x1b[0m`, "online");
+  console.log(`Express server (${env}) puerto ${port}: \x1b[32m%s\x1b[0m`, "online");
 });
