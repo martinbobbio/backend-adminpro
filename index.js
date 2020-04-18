@@ -58,5 +58,5 @@ app.listen(port, () => {
   console.log(`Express server: \x1b[32m%s\x1b[0m`, "online");
 });
 
-console.log("Environment: ", env)
-console.log("Port: ", port)
+console.log(`Port: \x1b[32m%s\x1b[0m`, port);
+console.log(`Env: \x1b[32m%s\x1b[0m`, env);
