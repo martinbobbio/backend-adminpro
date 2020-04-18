@@ -27,7 +27,7 @@ else if(env === 'prod') adressDB = 'mongodb://mbobbio:mbobbio1010@ds155626.mlab.
 else if(env === 'docker') adressDB = 'mongodb://mongo:27017/hospitalDB'
   
 mongoose.connect(adressDB, { useNewUrlParser: true })
-.then(() => console.log("Base de datos "+env+": \x1b[32m%s\x1b[0m", "online"))
+.then(() => console.log("Base de datos: \x1b[32m%s\x1b[0m", "online"))
 .catch(error => console.log(`Error al conectar la DB en ${env}`, error))
 mongoose.set('useCreateIndex', true);
 mongoose.set('useNewUrlParser', true)
@@ -55,5 +55,8 @@ app.use("/", appRoutes);
 //Listener
 const port = process.env.PORT || 8080
 app.listen(port, () => {
-  console.log(`Express server (${env}) puerto ${port}: \x1b[32m%s\x1b[0m`, "online");
+  console.log(`Express server: \x1b[32m%s\x1b[0m`, "online");
 });
+
+console.log("Environment: ", env)
+console.log("Port: ", port)
