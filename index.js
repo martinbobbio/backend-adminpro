@@ -29,8 +29,6 @@ else if(env === 'docker') adressDB = 'mongodb://mongo:27017/hospitalDB'
 mongoose.connect(adressDB, { useNewUrlParser: true })
 .then(() => console.log("Base de datos: \x1b[32m%s\x1b[0m", "online"))
 .catch(error => console.log(`Error al conectar la DB en ${env}`, error))
-mongoose.set('useCreateIndex', true);
-mongoose.set('useNewUrlParser', true)
 
 //Import Routes
 var appRoutes = require("./routes/app");
